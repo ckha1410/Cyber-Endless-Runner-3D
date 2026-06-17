@@ -38,17 +38,17 @@ Dự án được phát triển như một **đồ án môn Đồ Họa Máy Tí
   <table>
     <tr>
       <td align="center">
-        <img src="./docs/screenshot_main.png" alt="Màn hình chính" width="400">
+        <img src="./Docs/screenshot_main.png" alt="Màn hình chính" width="400">
         <br><em>🏠 Màn hình chính</em>
       </td>
       <td align="center">
-        <img src="./docs/screenshot_gameplay.png" alt="Chế độ Gameplay" width="400">
+        <img src="./Docs/screenshot_gameplay.png" alt="Chế độ Gameplay" width="400">
         <br><em>🎮 Chế độ Gameplay</em>
       </td>
     </tr>
     <tr>
       <td align="center" colspan="2">
-        <img src="./docs/screenshot_gallery.png" alt="Demo Gallery" width="600">
+        <img src="./Docs/screenshot_gallery.png" alt="Demo Gallery" width="600">
         <br><em>🖼️ Phòng Trưng Bày Hình Học (Demo Gallery)</em>
       </td>
     </tr>
