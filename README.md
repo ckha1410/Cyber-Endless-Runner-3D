@@ -26,7 +26,7 @@
 
 ## 🌐 Giới thiệu
 
-**Cyber Endless Runner 3D** là một trò chơi đua xe vô tận *(endless runner)* chạy hoàn toàn trên trình duyệt, được xây dựng bằng **Three.js** và **WebGL thuần**. Bối cảnh là một thành phố Cyberpunk không ngủ — nơi những tòa cao ốc phát sáng neon xanh/hồng/vàng vút lên bầu trời gradient, những con đường chạy dài vô tận dưới chân robot mascot của bạn.
+**Cyber Endless Runner 3D** là một trò chơi chạy vô tận *(endless runner)* chạy hoàn toàn trên trình duyệt, được xây dựng bằng **Three.js** và **WebGL thuần**. Bối cảnh là một thành phố Cyberpunk không ngủ — nơi những tòa cao ốc phát sáng neon xanh/hồng/vàng vút lên bầu trời gradient, những con đường chạy dài vô tận dưới chân robot mascot của bạn.
 
 Dự án được phát triển như một **đồ án môn Đồ Họa Máy Tính**, với mục tiêu chứng minh toàn bộ pipeline đồ họa 3D: từ việc dựng cảnh thủ công bằng primitive geometry, áp dụng Phong Lighting Model, shadow mapping cho đến post-processing bloom và custom GLSL shader. Thay vì một demo khô khan, toàn bộ kỹ thuật học thuật được đặt trong một **vòng gameplay thực sự** — robot chạy, nhảy, né chướng ngại vật và thu thập năng lượng giữa một thành phố neon sống động.
 
