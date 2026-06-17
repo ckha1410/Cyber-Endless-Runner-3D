@@ -17,7 +17,7 @@
 
 <br/>
 
-<img src="./docs/demo.mp4" alt="Cyber Endless Runner 3D - Gameplay Demo" width="100%">
+<img src="Docs/demo.gif" alt="Cyber Endless Runner 3D - Gameplay Demo" width="100%">
 <p><em>🎮 Gameplay</em></p>
 
 </div>
@@ -37,18 +37,18 @@ Dự án được phát triển như một **đồ án môn Đồ Họa Máy Tí
 <div align="center">
   <table>
     <tr>
-      <td align="center">
-        <img src="Docs/screenshot_main.png" alt="Màn hình chính" width="400">
+      <td align="center" colspan="2">
+        <img src="Docs/screenshot_main.png" alt="Màn hình chính" width="600">
         <br><em>🏠 Màn hình chính</em>
       </td>
+    </tr>
+    <tr>
       <td align="center">
         <img src="Docs/screenshot_gameplay.png" alt="Chế độ Gameplay" width="400">
         <br><em>🎮 Chế độ Gameplay</em>
       </td>
-    </tr>
-    <tr>
-      <td align="center" colspan="2">
-        <img src="Docs/screenshot_gallery.png" alt="Demo Gallery" width="600">
+      <td align="center">
+        <img src="Docs/screenshot_gallery.png" alt="Demo Gallery" width="400">
         <br><em>🖼️ Phòng Trưng Bày Hình Học (Demo Gallery)</em>
       </td>
     </tr>
