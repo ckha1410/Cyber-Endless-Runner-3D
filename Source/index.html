@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Cyber Endless Runner 3D</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/main.css?v=20260531-update-8">
+</head>
+
+<body>
+    <div id="app" aria-label="Cyber Endless Runner 3D canvas"></div>
+
+    <main class="game-shell">
+        <section class="hud" aria-label="Game dashboard">
+            <div class="brand-block">
+                <span class="eyebrow">CS105 WebGL Project</span>
+                <h1>Cyber Endless Runner 3D</h1>
+            </div>
+            <div class="stat-grid">
+                <article class="stat-card primary play-only-stat">
+                    <span>Score</span>
+                    <strong id="runner-score">00000</strong>
+                </article>
+                <article class="stat-card play-only-stat">
+                    <span>Coins</span>
+                    <strong id="coin-count">00</strong>
+                </article>
+                <article class="stat-card play-only-stat">
+                    <span>Combo</span>
+                    <strong id="combo-count">x1</strong>
+                </article>
+                <article class="stat-card play-only-stat">
+                    <span>Speed</span>
+                    <strong id="speed-count">7.8 m/s</strong>
+                </article>
+                <article class="stat-card play-only-stat">
+                    <span>Camera</span>
+                    <strong id="camera-mode">NORMAL</strong>
+                </article>
+                <article class="stat-card play-only-stat">
+                    <span>Shield</span>
+                    <strong id="shield-count">OFF</strong>
+                </article>
+                <article class="stat-card play-only-stat">
+                    <span>Best</span>
+                    <strong id="high-score">00000</strong>
+                </article>
+                <!-- State card: visible in both modes, uses visibility:hidden trick for siblings -->
+                <article class="stat-card">
+                    <span>State</span>
+                    <strong id="game-status">MENU</strong>
+                </article>
+            </div>
+
+            <div class="hud-actions">
+                <button id="pause-button" class="icon-button gallery-hidden" type="button"
+                    title="Pause or resume">II</button>
+                <button id="camera-button" class="icon-button wide" type="button"
+                    title="Switch camera preset">Cam</button>
+                <button id="gallery-button" class="icon-button wide gallery-hidden" type="button"
+                    title="Open graphics demo gallery">Demo</button>
+                <button id="gallery-exit-btn" class="icon-button wide gallery-only" type="button" hidden
+                    title="Thoát Demo Gallery">Thoát</button>
+            </div>
+        </section>
+
+        <!-- ══════════════════════════════════════════
+             TASK 2 — Gallery Top Control Bar
+        ══════════════════════════════════════════ -->
+        <div id="gallery-topbar" class="gallery-topbar" hidden>
+            <!-- Group 1: Geometry -->
+            <details class="gtb-dropdown" id="gtb-group-geo">
+                <summary class="gtb-dropbtn">🔷 Hình Học</summary>
+                <div class="gtb-dropdown-content">
+                    <label class="gtb-label">➕ Thêm khối</label>
+                    <select id="gtb-geometry" class="gtb-select">
+                        <option value="">-- Chọn khối --</option>
+                        <option value="Torus Knot">Torus Knot (Nút thắt)</option>
+                        <option value="Tetrahedron">Tetrahedron (Khối 4 mặt)</option>
+                        <option value="Octahedron">Octahedron (Khối 8 mặt)</option>
+                        <option value="Icosahedron">Icosahedron (Khối 20 mặt)</option>
+                        <option value="Heart">❤ Heart (Trái tim)</option>
+                    </select>
+                    <button id="gtb-geo-cancel" class="gtb-btn gtb-btn-danger" title="Huỷ khối đang hiển thị">✕ Huỷ
+                        khối</button>
+                </div>
+            </details>
+
+            <!-- Group 2: Texture / Material -->
+            <details class="gtb-dropdown" id="gtb-group-mat">
+                <summary class="gtb-dropbtn">🎨 Texture Mapping</summary>
+                <div class="gtb-dropdown-content">
+                    <label class="gtb-label">✨ Chọn chất liệu</label>
+                    <select id="gtb-material" class="gtb-select">
+                        <option value="solid">Solid (Mặc định)</option>
+                        <option value="circuit">Circuit Board (Mạch điện)</option>
+                        <option value="carbon">Carbon Fiber (Sợi carbon)</option>
+                        <option value="hologram">Holo Grid (Lưới Hologram)</option>
+                    </select>
+                    <div class="gtb-divider"></div>
+                    <label class="gtb-upload-label" title="Upload ảnh texture">
+                        📁 Upload ảnh
+                        <input id="texture-input" type="file" accept="image/*" style="display:none;">
+                    </label>
+                    <button id="gtb-mat-reset" class="gtb-btn" title="Xóa texture, quay về gốc">↺ Reset về gốc</button>
+                </div>
+            </details>
+
+            <!-- Group 3: Animation -->
+            <details class="gtb-dropdown" id="gtb-group-ani">
+                <summary class="gtb-dropbtn">▶ Animation</summary>
+                <div class="gtb-dropdown-content">
+                    <label class="gtb-label">🎬 Chọn hiệu ứng</label>
+                    <select id="gtb-animation" class="gtb-select">
+                        <option value="none">Rotate Slow (Mặc định)</option>
+                        <option value="bounce">Bounce (Nhảy)</option>
+                        <option value="pulse">Pulse (Thở)</option>
+                    </select>
+                    <button id="gtb-anim-reset" class="gtb-btn" title="Quay về trạng thái gốc">↺ Reset
+                        Animation</button>
+                </div>
+            </details>
+
+            <!-- Group 4: Lighting & Shadow -->
+            <details class="gtb-dropdown" id="gtb-group-light">
+                <summary class="gtb-dropbtn">💡 Chiếu sáng &amp; Bóng đổ</summary>
+                <div class="gtb-dropdown-content gtb-light-content">
+                    <label class="gtb-label">⚡ Sinh nguồn sáng</label>
+                    <p class="gtb-hint">Chọn vật thể 3D rồi bấm nút bên dưới</p>
+                    <button id="gtb-spawn-point" class="gtb-light-spawn gtb-light-point"
+                        title="Sinh Point Light vào vị trí trước vật">● Point Light</button>
+                    <button id="gtb-spawn-dir" class="gtb-light-spawn gtb-light-dir-spawn"
+                        title="Sinh Directional Light">▶ Directional</button>
+                    <button id="gtb-spawn-ambient" class="gtb-light-spawn gtb-light-amb" title="Sinh Ambient Light">☀
+                        Ambient</button>
+                    <div class="gtb-divider"></div>
+                    <label class="gtb-label">👁 Tùy chọn</label>
+                    <button id="gtb-light-helper" class="gtb-btn" title="Hiển thị/Ẩn Light Helper">🔦 Light
+                        Helper</button>
+                    <button id="gtb-light-remove" class="gtb-btn gtb-btn-danger" title="Xóa đèn đã spawn">✕ Xóa
+                        đèn</button>
+                    <div class="gtb-divider"></div>
+                    <button id="gtb-light-settings" class="gtb-btn" title="Mở dat.GUI chỉnh cường độ">⚙ dat.GUI</button>
+                </div>
+            </details>
+
+            <!-- Group 5: Camera -->
+            <details class="gtb-dropdown" id="gtb-group-camera">
+                <summary class="gtb-dropbtn">🎥 Camera</summary>
+                <div class="gtb-dropdown-content">
+                    <label class="gtb-label">🔧 Điều chỉnh</label>
+                    <button id="gtb-camera-gui" class="gtb-btn">⚙ Mở dat.GUI Camera</button>
+                    <button id="gtb-camera-cycle" class="gtb-btn">🔄 Chuyển đổi góc nhìn</button>
+                    <button id="gtb-camera-reset" class="gtb-btn">↺ Reset Camera</button>
+                    <button id="gtb-camera-orbit" class="gtb-btn">🔄 Tự động xoay (Demo Orbit)</button>
+                </div>
+            </details>
+
+            <!-- Group 6: Biến đổi Affine -->
+            <details class="gtb-dropdown" id="gtb-group-affine">
+                <summary class="gtb-dropbtn">📊 Biến Đổi Affine</summary>
+                <div class="gtb-dropdown-content">
+                    <label class="gtb-label">⚙ Điều chỉnh Transform</label>
+                    <button id="gtb-affine-gui" class="gtb-btn">⚙ Mở dat.GUI Affine</button>
+                    <button id="gtb-affine-reset" class="gtb-btn">↺ Reset Affine (Gốc)</button>
+                </div>
+            </details>
+        </div>
+
+
+        <!-- Gallery: Guide button (top-right, below hud-actions) -->
+        <button id="gallery-guide-btn" class="gallery-guide-btn gallery-only" type="button" hidden
+            title="Hướng dẫn Gallery">
+            📖 Hướng dẫn
+        </button>
+        <!-- Gallery: Dat.GUI button (top-right, below guide) -->
+        <button id="gallery-datgui-btn" class="gallery-guide-btn gallery-only" type="button" hidden
+            title="Bật/Tắt dat.GUI" style="top: 120px;">
+            ⚙ dat.GUI
+        </button>
+        <aside id="gallery-guide-panel" class="gallery-guide-panel" aria-label="Hướng dẫn Gallery" hidden>
+            <div class="gallery-guide-header">
+                <span class="eyebrow" style="color: #38bdf8; font-weight: bold; text-transform: uppercase;">Hướng Dẫn
+                    Tương Tác</span>
+                <button id="gallery-guide-close" class="icon-button" type="button" title="Thu lại">&#8722;</button>
+            </div>
+            <div class="selected-row">
+                <span>Đang thao tác:</span>
+                <strong id="selected-object" style="color: #fde68a; font-size: 14px;">Box</strong>
+            </div>
+            <ul class="checklist" style="overflow-y: auto; max-height: 50vh; padding-right: 5px;">
+                <li><strong style="color:#67e8f9;">1. Chọn hình khối:</strong> Nhấn chuột trực tiếp vào hình hiện có
+                    hoặc dùng
+                    menu <em>Hình học</em> để sinh khối 3D mới.</li>
+                <li><strong style="color:#67e8f9;">2. Biến đổi (Affine):</strong> Kéo thả bằng chuột, hoặc sử dụng các
+                    phím tắt. <strong>Phím tắt:</strong> Nhấn các dấu mũi tên để tịnh tiến,
+                    nhấn R + X/Y/Z để xoay, nhấn +/- để phóng to/thu nhỏ. Quan sát ma trận Affine bên
+                    trái. Hoặc mở
+                    <em>dat.GUI Affine</em> tại menu <em>Biến đổi Affine</em>.
+                </li>
+                <li><strong style="color:#67e8f9;">3. Camera:</strong> Tại menu <em>Camera</em>, nút <em>Chuyển đổi góc
+                        nhìn</em> đổi chế độ
+                    Perspective (Phối cảnh) / Orthographic (Trực giao). Nút <em>Tự động xoay</em> bật/tắt chế độ camera
+                    tự bay quanh cảnh. Hoặc mở <em>dat.GUI Camera</em> để tương tác trực tiếp.</li>
+                <li><strong style="color:#67e8f9;">4. Ánh sáng:</strong> Tại menu <em>Chiếu sáng</em>, sinh đèn
+                    Point/Directional/Ambient. Bật <em>Light Helper</em> để xem nguồn sáng và kéo thả nguồn sáng để xem
+                    bóng bổ. Mở <em>dat.GUI Lighting</em> để điều chỉnh trực tiếp các nguồn sáng hiện có.</li>
+                <li><strong style="color:#67e8f9;">5. Bề mặt (Material):</strong> Menu <em>Texture Mapping</em> cho phép
+                    đổi chất liệu (Hologram, Mạch điện, Carbon...) hoặc upload một ảnh từ máy tính để áp lên đối tượng.
+                </li>
+                <li><strong style="color:#67e8f9;">6. Hiệu ứng (Animation):</strong> Menu <em>Animation</em> kích hoạt
+                    chế độ nảy (Bounce) hoặc thở (Pulse) cho đối tượng đang được chọn.</li>
+                <li><strong style="color:#fca5a5;">7. Khôi Phục:</strong> Nhấn <strong>Khôi Phục Toàn Bộ</strong> ở bên
+                    trái để xoá sạch mọi thứ bạn vừa tạo và đưa phòng trưng bày về nguyên bản.</li>
+            </ul>
+        </aside>
+
+        <!-- Hidden texture buttons for manager.js binding -->
+        <div style="display:none;">
+            <button class="texture-btn" data-tex="circuit">Circuit</button>
+            <button class="texture-btn" data-tex="carbon">Carbon</button>
+            <button class="texture-btn" data-tex="hologram">Holo Grid</button>
+            <button class="texture-btn" data-tex="reset">Reset</button>
+        </div>
+
+        <!-- back-game-button hidden (required by manager.js closeGallery) -->
+        <button id="back-game-button" type="button" hidden aria-hidden="true" style="display:none;">Back</button>
+
+        <nav class="mobile-controls" aria-label="Touch controls">
+            <button id="touch-left" type="button" aria-label="Move left">&larr;</button>
+            <button id="touch-jump" type="button" aria-label="Jump">&uarr;</button>
+            <button id="touch-right" type="button" aria-label="Move right">&rarr;</button>
+        </nav>
+
+        <div id="feedback-layer" class="feedback-layer" aria-hidden="true"></div>
+
+        <section id="start-overlay" class="overlay">
+            <div class="overlay-content">
+                <div class="lobby-stage" aria-hidden="true">
+                    <div class="lobby-coin coin-a"></div>
+                    <div class="lobby-coin coin-b"></div>
+                    <div class="lobby-coin coin-c"></div>
+                    <div class="lobby-robot">
+                        <div class="robot-antenna"></div>
+                        <div class="robot-head">
+                            <span></span>
+                        </div>
+                        <div class="robot-body">
+                            <i></i>
+                        </div>
+                        <div class="robot-arm left"></div>
+                        <div class="robot-arm right"></div>
+                        <div class="robot-leg left"></div>
+                        <div class="robot-leg right"></div>
+                    </div>
+                    <div class="lobby-platform"></div>
+                </div>
+
+                <div class="overlay-copy">
+                    <span class="eyebrow">Three.js / WebGL / JavaScript</span>
+                    <h2 id="overlay-title">Cyber Endless Runner 3D</h2>
+                    <p id="overlay-text">Three.js/WebGL endless runner with affine transforms, perspective camera,
+                        lights, shadows, textures and realtime animation.</p>
+                    <div class="overlay-actions">
+                        <button id="start-button" type="button">Start Run</button>
+                        <button id="resume-button" type="button" hidden>Resume</button>
+                        <button id="restart-button" type="button" hidden>Restart</button>
+                        <button id="home-button" type="button" hidden>Home</button>
+                        <button id="gallery-button-overlay" type="button">Demo Gallery</button>
+                    </div>
+                    <div class="hint-strip">
+                        <span>A/D or &larr;/&rarr;: lane</span>
+                        <span>Space/&uarr;: jump</span>
+                        <span>G: demo gallery</span>
+                        <span>C: camera</span>
+                        <span>M: marble mode</span>
+                        <span>H: home</span>
+                        <span>P: pause</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script type="module" src="./dist/app.bundle.js?v=20260616-update-19"></script>
+
+    <!-- Geometry Showcase & Matrix Panel -->
+    <div id="showcase-panel"
+        style="position:fixed;top:94px;left:18px;background:rgba(10,10,46,0.9);color:#e2e8f0;padding:20px;font-family:ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;font-size:14px;border:1px solid rgba(255,255,255,0.1);border-radius:12px;z-index:9999;display:none;width:340px;backdrop-filter:blur(8px);box-shadow:0 10px 25px rgba(0,0,0,0.5);">
+        <div
+            style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:8px;">
+            <span
+                style="font-size:0.7rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#38bdf8;">Phòng
+                Trưng Bày Hình Học</span>
+        </div>
+        <p id="showcase-desc" style="margin:0 0 15px 0;color:#94a3b8;font-size:13px;line-height:1.5;">Đang tải...</p>
+
+        <div style="margin-bottom:15px;">
+            <label for="object-select"
+                style="font-size:12px;font-weight:600;color:#94a3b8;text-transform:uppercase;">Đối tượng được
+                chọn:</label>
+            <select id="object-select"
+                style="width:100%;margin-top:6px;background:rgba(0,0,0,0.5);color:#fff;border:1px solid rgba(255,255,255,0.2);padding:8px;border-radius:6px;font-family:inherit;font-size:13px;outline:none;">
+            </select>
+        </div>
+
+        <div style="font-size:12px;font-weight:600;color:#94a3b8;text-transform:uppercase;margin-bottom:6px;">Ma Trận
+            Affine (4x4)</div>
+        <div id="matrix-display"
+            style="background:rgba(0,0,0,0.5);color:#a78bfa;padding:12px;font-size:13px;font-family:monospace;white-space:pre;line-height:1.4;overflow-x:auto;border-radius:6px;border:1px solid rgba(255,255,255,0.1);font-weight:500;">
+            [1.00, 0.00, 0.00, 0.00]
+            [0.00, 1.00, 0.00, 0.00]
+            [0.00, 0.00, 1.00, 0.00]
+            [0.00, 0.00, 0.00, 1.00]
+        </div>
+
+        <div style="font-size:12px;font-weight:600;color:#94a3b8;text-transform:uppercase;margin:15px 0 6px 0;">Điều
+            khiển biến đổi nhanh</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:12px;">
+            <button class="transform-btn" data-axis="x"
+                style="background:rgba(255,255,255,0.1);color:#fff;border:none;padding:6px;border-radius:4px;cursor:pointer;font-size:12px;transition:0.2s;">X
+                Rotate</button>
+            <button class="transform-btn" data-axis="y"
+                style="background:rgba(255,255,255,0.1);color:#fff;border:none;padding:6px;border-radius:4px;cursor:pointer;font-size:12px;transition:0.2s;">Y
+                Rotate</button>
+            <button class="transform-btn" data-axis="z"
+                style="background:rgba(255,255,255,0.1);color:#fff;border:none;padding:6px;border-radius:4px;cursor:pointer;font-size:12px;transition:0.2s;">Z
+                Rotate</button>
+        </div>
+
+        <button id="reset-transform-btn"
+            style="width:100%;background:#38bdf8;color:#0f172a;border:none;padding:10px;border-radius:6px;cursor:pointer;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:0.05em;transition:0.2s;">Reset
+            Transform</button>
+        <button id="gallery-reset-all-btn"
+            style="width:100%;background:#ef4444;color:#ffffff;border:none;padding:10px;margin-top:10px;border-radius:6px;cursor:pointer;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:0.05em;transition:0.2s;">Khôi
+            Phục Toàn Bộ</button>
+    </div>
+    <style>
+        .transform-btn:hover {
+            background: rgba(255, 255, 255, 0.2) !important;
+        }
+
+        #reset-transform-btn:hover {
+            background: #7dd3fc !important;
+        }
+
+        /* Cyberpunk dat.GUI Theme */
+        .dg.ac {
+            display: none;
+            z-index: 8000 !important;
+            top: 165px !important;
+            right: 18px !important;
+        }
+
+        .dg.main {
+            background-color: rgba(10, 10, 46, 0.95) !important;
+            border-left: 2px solid #38bdf8 !important;
+            border-radius: 8px 0 0 8px !important;
+            box-shadow: -5px 0 25px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+        }
+
+        .dg li.title {
+            background: rgba(56, 189, 248, 0.2) !important;
+            color: #38bdf8 !important;
+            text-shadow: 0 0 5px rgba(56, 189, 248, 0.5);
+            font-weight: bold !important;
+            text-transform: uppercase;
+        }
+
+        .dg .cr.function {
+            border-left: 3px solid #ff00ff !important;
+        }
+
+        .dg .cr.boolean {
+            border-left: 3px solid #00ffff !important;
+        }
+
+        .dg .cr.number {
+            border-left: 3px solid #facc15 !important;
+        }
+
+        .dg .c input[type=text] {
+            background: rgba(0, 0, 0, 0.5) !important;
+            color: #a78bfa !important;
+        }
+
+        .dg .c .slider {
+            background: #333 !important;
+        }
+
+        .dg .c .slider-fg {
+            background: #38bdf8 !important;
+        }
+
+        /* ══════════════════════════════════════════
+           TASK 1 — Gallery UI
+        ══════════════════════════════════════════ */
+        /* Đảm bảo thuộc tính hidden HTML ghi đè display: flex */
+        [hidden] {
+            display: none !important;
+        }
+
+        /* Dùng visibility:hidden để stat-grid giữ nguyên kích thước layout */
+        body.gallery-mode .play-only-stat {
+            visibility: hidden !important;
+        }
+
+        /* Ẩn nút Pause, Demo trong Gallery (không có tác dụng) */
+        body.gallery-mode .gallery-hidden {
+            display: none !important;
+        }
+
+        /* Hiển thị các element chỉ dành cho Gallery */
+        body:not(.gallery-mode) .gallery-only {
+            display: none !important;
+        }
+
+        body.gallery-mode .gallery-only {
+            display: flex;
+            /* Hoặc block tùy element, nhưng flex an toàn cho icon-button */
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ══════════════════════════════════════════
+           TASK 2 — Gallery Top Control Bar
+        ══════════════════════════════════════════ */
+        .gallery-topbar {
+            position: absolute;
+            top: 18px;
+            left: 50%;
+            transform: translateX(calc(-50% + 40px));
+            z-index: 8500;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 8px 16px;
+            width: 80%;
+            max-width: 900px;
+            background: rgba(5, 5, 30, 0.88);
+            backdrop-filter: blur(14px);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(56, 189, 248, 0.08);
+            pointer-events: auto;
+        }
+
+        .gtb-dropdown {
+            position: relative;
+        }
+
+        .gtb-dropbtn {
+            background: rgba(10, 10, 46, 0.6);
+            color: #38bdf8;
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            list-style: none;
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            transition: all 0.2s;
+        }
+
+        .gtb-dropbtn::-webkit-details-marker {
+            display: none;
+        }
+
+        .gtb-dropbtn:hover,
+        .gtb-dropdown[open] .gtb-dropbtn {
+            background: rgba(56, 189, 248, 0.2);
+            border-color: #38bdf8;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+        }
+
+        .gtb-dropdown-content {
+            position: absolute;
+            top: calc(100% + 12px);
+            left: 0;
+            background: rgba(10, 10, 46, 0.95);
+            border: 1px solid #38bdf8;
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 200px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+        }
+
+        .gtb-dropdown-content::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: 20px;
+            border-width: 0 6px 6px 6px;
+            border-style: solid;
+            border-color: transparent transparent #38bdf8 transparent;
+        }
+
+        /* Update other buttons to match min-width */
+        .gtb-select,
+        .gtb-btn,
+        .gtb-upload-label,
+        .gtb-light-btn {
+            width: 100%;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .gtb-select {
+            background: rgba(0, 0, 0, 0.55);
+            color: #e2e8f0;
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            border-radius: 6px;
+            padding: 8px;
+            font-size: 12px;
+            font-family: inherit;
+            outline: none;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .gtb-select:focus {
+            border-color: #38bdf8;
+        }
+
+        .gtb-btn {
+            background: rgba(255, 255, 255, 0.07);
+            color: #cbd5e1;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 6px;
+            padding: 8px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+        }
+
+        .gtb-btn:hover {
+            background: rgba(56, 189, 248, 0.15);
+            border-color: #38bdf8;
+            color: #38bdf8;
+        }
+
+        .gtb-btn-danger {
+            color: #fca5a5;
+            border-color: rgba(239, 68, 68, 0.35);
+        }
+
+        .gtb-btn-danger:hover {
+            background: rgba(239, 68, 68, 0.18);
+            border-color: #ef4444;
+            color: #fca5a5;
+        }
+
+        .gtb-upload-label {
+            background: rgba(255, 255, 255, 0.07);
+            color: #cbd5e1;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 6px;
+            padding: 8px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .gtb-upload-label:hover {
+            background: rgba(56, 189, 248, 0.15);
+            border-color: #38bdf8;
+            color: #38bdf8;
+        }
+
+        /* Light buttons */
+        .gtb-light-btn {
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 6px;
+            padding: 8px 10px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            opacity: 0.55;
+        }
+
+        .gtb-light-btn.active {
+            opacity: 1;
+        }
+
+        .gtb-light-ambient {
+            background: rgba(250, 204, 21, 0.12);
+            color: #fde68a;
+            border-color: rgba(250, 204, 21, 0.4);
+        }
+
+        .gtb-light-ambient.active {
+            background: rgba(250, 204, 21, 0.28);
+            box-shadow: 0 0 10px rgba(250, 204, 21, 0.5);
+        }
+
+        .gtb-light-dir {
+            background: rgba(251, 191, 36, 0.12);
+            color: #fcd34d;
+            border-color: rgba(251, 191, 36, 0.4);
+        }
+
+        .gtb-light-dir.active {
+            background: rgba(251, 191, 36, 0.28);
+            box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+        }
+
+        .gtb-light-cyan {
+            background: rgba(34, 211, 238, 0.12);
+            color: #67e8f9;
+            border-color: rgba(34, 211, 238, 0.4);
+        }
+
+        .gtb-light-cyan.active {
+            background: rgba(34, 211, 238, 0.28);
+            box-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
+        }
+
+        .gtb-light-pink {
+            background: rgba(244, 114, 182, 0.12);
+            color: #f9a8d4;
+            border-color: rgba(244, 114, 182, 0.4);
+        }
+
+        .gtb-light-pink.active {
+            background: rgba(244, 114, 182, 0.28);
+            box-shadow: 0 0 10px rgba(244, 114, 182, 0.5);
+        }
+
+        /* ── New helper elements ── */
+        .gtb-label {
+            display: block;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #38bdf8;
+            margin-bottom: 2px;
+        }
+
+        .gtb-hint {
+            font-size: 11px;
+            color: #94a3b8;
+            margin: 0 0 4px 0;
+            line-height: 1.4;
+            padding: 4px 6px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+        }
+
+        .gtb-divider {
+            height: 1px;
+            background: rgba(56, 189, 248, 0.2);
+            margin: 4px 0;
+        }
+
+        /* Light spawn buttons */
+        .gtb-light-spawn {
+            width: 100%;
+            box-sizing: border-box;
+            text-align: center;
+            border-radius: 6px;
+            padding: 9px 10px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid;
+        }
+
+        .gtb-light-point {
+            background: rgba(34, 211, 238, 0.12);
+            color: #67e8f9;
+            border-color: rgba(34, 211, 238, 0.4);
+        }
+
+        .gtb-light-point:hover,
+        .gtb-light-point.active {
+            background: rgba(34, 211, 238, 0.3);
+            box-shadow: 0 0 14px rgba(34, 211, 238, 0.6);
+        }
+
+        .gtb-light-dir-spawn {
+            background: rgba(250, 204, 21, 0.12);
+            color: #fde68a;
+            border-color: rgba(250, 204, 21, 0.4);
+        }
+
+        .gtb-light-dir-spawn:hover,
+        .gtb-light-dir-spawn.active {
+            background: rgba(250, 204, 21, 0.3);
+            box-shadow: 0 0 14px rgba(250, 204, 21, 0.6);
+        }
+
+        .gtb-light-amb {
+            background: rgba(251, 191, 36, 0.12);
+            color: #fcd34d;
+            border-color: rgba(251, 191, 36, 0.4);
+        }
+
+        .gtb-light-amb:hover,
+        .gtb-light-amb.active {
+            background: rgba(251, 191, 36, 0.3);
+            box-shadow: 0 0 14px rgba(251, 191, 36, 0.5);
+        }
+
+        /* wider content for light panel */
+        .gtb-light-content {
+            min-width: 220px;
+        }
+
+        /* ── Exit Button (Thoát) ── */
+        .gallery-exit-btn {
+            background: rgba(127, 29, 29, 0.85);
+            color: #fca5a5;
+            border: 1px solid #ef4444;
+            transition: background 0.2s, box-shadow 0.2s;
+        }
+
+        .gallery-exit-btn:hover {
+            background: rgba(220, 38, 38, 0.75);
+            box-shadow: 0 0 22px rgba(239, 68, 68, 0.6);
+        }
+
+        /* ── Nút Hướng dẫn — góc trên phải ── */
+        .gallery-guide-btn {
+            position: fixed;
+            top: 72px;
+            right: 18px;
+            z-index: 8000;
+            background: rgba(10, 10, 46, 0.85);
+            color: #38bdf8;
+            border: 1px solid rgba(56, 189, 248, 0.5);
+            border-radius: 6px;
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: 800;
+            min-width: 130px;
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.22);
+            transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+        }
+
+        .gallery-guide-btn:hover {
+            background: rgba(56, 189, 248, 0.2);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* ── Panel Hướng dẫn ── */
+        .gallery-guide-panel {
+            position: fixed;
+            top: 120px;
+            right: 16px;
+            z-index: 8001;
+            width: 300px;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+            background: rgba(10, 10, 46, 0.93);
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            border-radius: 10px;
+            padding: 14px;
+            color: #e2e8f0;
+            font-size: 13px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 18px rgba(56, 189, 248, 0.1);
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.25s ease, transform 0.25s ease;
+            pointer-events: none;
+        }
+
+        .gallery-guide-panel.open {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .gallery-guide-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(56, 189, 248, 0.25);
+        }
+
+        .gallery-guide-panel .selected-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(56, 189, 248, 0.08);
+            border-radius: 6px;
+            padding: 6px 10px;
+            margin-bottom: 10px;
+            font-size: 12px;
+        }
+
+        .gallery-guide-panel .checklist {
+            padding-left: 16px;
+            margin: 0 0 4px 0;
+        }
+
+        .gallery-guide-panel .checklist li {
+            margin-bottom: 5px;
+            line-height: 1.45;
+            color: #cbd5e1;
+        }
+
+        .gallery-guide-panel .texture-btn {
+            background: rgba(0, 0, 0, 0.4);
+            color: #38bdf8;
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            padding: 4px 10px;
+            font-size: 11px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .gallery-guide-panel .texture-btn:hover {
+            background: rgba(56, 189, 248, 0.2);
+        }
+
+        .gallery-guide-panel .texture-picker {
+            color: #94a3b8;
+            font-size: 12px;
+        }
+
+        .gallery-guide-panel .texture-picker input {
+            margin-top: 4px;
+            width: 100%;
+        }
+
+        /* ── CUSTOM DAT.GUI STYLE ── */
+        .dg.ac {
+            z-index: 2000 !important;
+        }
+
+        .dg.main {
+            background-color: rgba(10, 10, 46, 0.95) !important;
+            border: 1px solid #38bdf8 !important;
+            border-radius: 8px !important;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6) !important;
+            backdrop-filter: blur(8px) !important;
+            overflow: hidden !important;
+        }
+
+        .dg li:not(.folder) {
+            background: transparent !important;
+            border-bottom: 1px solid rgba(56, 189, 248, 0.1) !important;
+        }
+
+        .dg .c .slider {
+            background: rgba(0, 0, 0, 0.5) !important;
+        }
+
+        .dg .c .slider-fg {
+            background: #38bdf8 !important;
+        }
+
+        .dg .cr.function:hover,
+        .dg .cr.boolean:hover {
+            background: rgba(56, 189, 248, 0.15) !important;
+        }
+
+        .dg .c input[type=text] {
+            background: rgba(0, 0, 0, 0.5) !important;
+            color: #38bdf8 !important;
+            border: 1px solid rgba(56, 189, 248, 0.35) !important;
+            border-radius: 4px !important;
+        }
+
+        .dg .c input[type=text]:hover {
+            border-color: #38bdf8 !important;
+        }
+
+        .dg li.title {
+            background: rgba(56, 189, 248, 0.2) !important;
+            color: #38bdf8 !important;
+            border-bottom: 1px solid #38bdf8 !important;
+            font-weight: bold !important;
+        }
+
+        .dg .property-name {
+            color: #cbd5e1 !important;
+            font-family: inherit !important;
+            font-size: 12px !important;
+        }
+
+        /* Hide Close Controls button */
+        .dg.main .close-button {
+            display: none !important;
+        }
+    </style>
+
+    <!-- TASK 1 & 2 — JS: Gallery UI logic -->
+    <script>
+        (function () {
+            var guideBtn = document.getElementById('gallery-guide-btn');
+            var guideClose = document.getElementById('gallery-guide-close');
+            var guidePanel = document.getElementById('gallery-guide-panel');
+            var exitBtn = document.getElementById('gallery-exit-btn');
+            var topbar = document.getElementById('gallery-topbar');
+
+            // ── Mở/đóng panel Hướng dẫn (toggle) ──
+            if (guideBtn && guidePanel) {
+                guideBtn.addEventListener('click', function () {
+                    var isOpen = guidePanel.classList.contains('open');
+                    var gui = document.querySelector('.dg.ac');
+                    if (isOpen) {
+                        guidePanel.classList.remove('open');
+                        guidePanel.addEventListener('transitionend', function hide() {
+                            guidePanel.hidden = true;
+                            guidePanel.removeEventListener('transitionend', hide);
+                        });
+                        if (gui) gui.style.display = 'block';
+                    } else {
+                        guidePanel.hidden = false;
+                        requestAnimationFrame(function () { guidePanel.classList.add('open'); });
+                        if (gui) gui.style.display = 'none';
+                    }
+                });
+            }
+            if (guideClose && guidePanel) {
+                guideClose.addEventListener('click', function () {
+                    var gui = document.querySelector('.dg.ac');
+                    guidePanel.classList.remove('open');
+                    guidePanel.addEventListener('transitionend', function hide() {
+                        guidePanel.hidden = true;
+                        guidePanel.removeEventListener('transitionend', hide);
+                    });
+                    if (gui) gui.style.display = 'block';
+                });
+            }
+
+            // ── Nút Thoát Gallery ──
+            if (exitBtn) {
+                exitBtn.addEventListener('click', function () {
+                    var backBtn = document.getElementById('back-game-button');
+                    if (backBtn) backBtn.click();
+                });
+            }
+
+            var datguiBtn = document.getElementById('gallery-datgui-btn');
+            if (datguiBtn) {
+                datguiBtn.addEventListener('click', function () {
+                    var gui = document.querySelector('.dg.ac');
+                    if (gui) {
+                        var willShow = (gui.style.display === 'none');
+                        gui.style.display = willShow ? 'block' : 'none';
+                        if (willShow && guidePanel && guidePanel.classList.contains('open')) {
+                            if (guideClose) guideClose.click();
+                        }
+                    }
+                });
+            }
+
+            var resetAllBtn = document.getElementById('gallery-reset-all-btn');
+            if (resetAllBtn) {
+                resetAllBtn.addEventListener('click', function () {
+                    document.dispatchEvent(new CustomEvent('gallery-reset-all'));
+                });
+            }
+
+            var matSelect = document.getElementById('gtb-material');
+            if (matSelect) {
+                matSelect.addEventListener('change', function () {
+                    var val = this.value;
+                    var texVal = val === 'solid' ? 'reset' : val;
+                    // Relay to manager.js via custom event
+                    document.dispatchEvent(new CustomEvent('gallery-set-texture-preset', { detail: texVal }));
+                });
+            }
+
+            // ── TASK 2: Top Bar — Upload texture bridge (Removed as manager handles directly) ──
+
+            // ── TASK 2: Top Bar — Reset material button ──
+            var matReset = document.getElementById('gtb-mat-reset');
+            if (matReset) {
+                matReset.addEventListener('click', function () {
+                    document.dispatchEvent(new CustomEvent('gallery-set-texture-preset', { detail: 'reset' }));
+                });
+            }
+
+            // ── TASK 2: Geometry — spawn-one-at-a-time: hủy cũ trước khi spawn mới ──
+            var geoSelect = document.getElementById('gtb-geometry');
+            if (geoSelect) {
+                geoSelect.addEventListener('change', function () {
+                    if (this.value) {
+                        document.dispatchEvent(new CustomEvent('gallery-cancel-geo'));
+                        document.dispatchEvent(new CustomEvent('gallery-spawn-geo', { detail: this.value }));
+                        this.value = '';
+                    }
+                });
+            }
+            var geoCancel = document.getElementById('gtb-geo-cancel');
+            if (geoCancel) {
+                geoCancel.addEventListener('click', function () {
+                    document.dispatchEvent(new CustomEvent('gallery-cancel-geo'));
+                });
+            }
+
+            // ── TASK 2: Animation dropdown + Reset button ──
+            var aniSelect = document.getElementById('gtb-animation');
+            if (aniSelect) {
+                aniSelect.addEventListener('change', function () {
+                    document.dispatchEvent(new CustomEvent('gallery-animation', { detail: this.value }));
+                });
+            }
+            var animReset = document.getElementById('gtb-anim-reset');
+            if (animReset) {
+                animReset.addEventListener('click', function () {
+                    if (aniSelect) aniSelect.value = 'none';
+                    document.dispatchEvent(new CustomEvent('gallery-animation', { detail: 'reset' }));
+                });
+            }
+
+            // ── TASK 4: Light spawn buttons ──
+            ['gtb-spawn-point', 'gtb-spawn-dir', 'gtb-spawn-ambient'].forEach(function (btnId) {
+                var btn = document.getElementById(btnId);
+                if (!btn) return;
+                btn.addEventListener('click', function () {
+                    ['gtb-spawn-point', 'gtb-spawn-dir', 'gtb-spawn-ambient'].forEach(function (id) {
+                        var b = document.getElementById(id);
+                        if (b) b.classList.remove('active');
+                    });
+                    btn.classList.add('active');
+                    var type = btnId === 'gtb-spawn-point' ? 'point'
+                        : btnId === 'gtb-spawn-dir' ? 'directional' : 'ambient';
+                    document.dispatchEvent(new CustomEvent('gallery-spawn-light', { detail: { type: type } }));
+                });
+            });
+
+            var lightHelper = document.getElementById('gtb-light-helper');
+            if (lightHelper) {
+                lightHelper.addEventListener('click', function () {
+                    lightHelper.classList.toggle('active');
+                    document.dispatchEvent(new CustomEvent('gallery-light-helper'));
+                });
+            }
+            var lightRemove = document.getElementById('gtb-light-remove');
+            if (lightRemove) {
+                lightRemove.addEventListener('click', function () {
+                    ['gtb-spawn-point', 'gtb-spawn-dir', 'gtb-spawn-ambient'].forEach(function (id) {
+                        var b = document.getElementById(id);
+                        if (b) b.classList.remove('active');
+                    });
+                    document.dispatchEvent(new CustomEvent('gallery-remove-light'));
+                });
+            }
+
+            // ── TASK 2: Light Settings / dat.GUI ──
+            var lightSettings = document.getElementById('gtb-light-settings');
+            if (lightSettings) {
+                lightSettings.addEventListener('click', function () {
+                    var gui = document.querySelector('.dg.ac');
+                    if (gui) {
+                        gui.style.display = 'block';
+                        document.dispatchEvent(new CustomEvent('gallery-open-gui-folder', { detail: 'World Lighting & Shadows' }));
+                        if (guidePanel && guidePanel.classList.contains('open') && guideClose) {
+                            guideClose.click();
+                        }
+                    }
+                });
+            }
+
+            // ── TASK 2: Camera menu buttons ──
+            var cameraGui = document.getElementById('gtb-camera-gui');
+            if (cameraGui) {
+                cameraGui.addEventListener('click', function () {
+                    var gui = document.querySelector('.dg.ac');
+                    if (gui) {
+                        gui.style.display = 'block';
+                        document.dispatchEvent(new CustomEvent('gallery-open-gui-folder', { detail: 'Perspective Camera' }));
+                        if (guidePanel && guidePanel.classList.contains('open') && guideClose) {
+                            guideClose.click();
+                        }
+                    }
+                });
+            }
+            var cameraCycle = document.getElementById('gtb-camera-cycle');
+            if (cameraCycle) {
+                cameraCycle.addEventListener('click', function () {
+                    var camBtn = document.getElementById('camera-button');
+                    if (camBtn) camBtn.dispatchEvent(new MouseEvent('click', { bubbles: false }));
+                });
+            }
+            var cameraReset = document.getElementById('gtb-camera-reset');
+            if (cameraReset) {
+                cameraReset.addEventListener('click', function () {
+                    document.dispatchEvent(new CustomEvent('gallery-camera-reset'));
+                });
+            }
+            var cameraOrbit = document.getElementById('gtb-camera-orbit');
+            if (cameraOrbit) {
+                cameraOrbit.addEventListener('click', function () {
+                    document.dispatchEvent(new CustomEvent('gallery-camera-orbit'));
+                });
+            }
+
+            // ── TASK 2: Affine menu buttons ──
+            var affineGui = document.getElementById('gtb-affine-gui');
+            if (affineGui) {
+                affineGui.addEventListener('click', function () {
+                    var gui = document.querySelector('.dg.ac');
+                    if (gui) {
+                        gui.style.display = 'block';
+                        document.dispatchEvent(new CustomEvent('gallery-open-gui-folder', { detail: 'Affine Transform Demo' }));
+                        if (guidePanel && guidePanel.classList.contains('open') && guideClose) {
+                            guideClose.click();
+                        }
+                    }
+                });
+            }
+            var affineReset = document.getElementById('gtb-affine-reset');
+            if (affineReset) {
+                affineReset.addEventListener('click', function () {
+                    document.dispatchEvent(new CustomEvent('gallery-animation', { detail: 'reset' }));
+                });
+            }
+
+
+
+            // ── Exclusive Details Dropdowns ──
+            var dropdowns = document.querySelectorAll('.gtb-dropdown');
+            dropdowns.forEach(function (d) {
+                d.addEventListener('click', function (e) {
+                    if (e.target.closest('.gtb-dropdown-content')) return;
+                    dropdowns.forEach(function (other) {
+                        if (other !== d) other.removeAttribute('open');
+                    });
+                });
+            });
+            document.addEventListener('click', function (e) {
+                if (!e.isTrusted) return; // Prevent synthetic clicks from closing dropdowns
+                if (!e.target.closest('.gtb-dropdown')) {
+                    dropdowns.forEach(function (d) { d.removeAttribute('open'); });
+                }
+            });
+
+
+            // ── Hiển thị/ẩn toàn bộ Gallery UI theo body.gallery-mode ──
+            var observer = new MutationObserver(function () {
+                var inGallery = document.body.classList.contains('gallery-mode');
+                if (guideBtn) guideBtn.hidden = !inGallery;
+                if (datguiBtn) datguiBtn.hidden = !inGallery;
+                if (exitBtn) exitBtn.hidden = !inGallery;
+                if (topbar) topbar.hidden = !inGallery;
+
+                var gui = document.querySelector('.dg.ac');
+                if (gui) gui.style.display = inGallery ? 'block' : 'none';
+
+                if (!inGallery && guidePanel) {
+                    guidePanel.classList.remove('open');
+                    guidePanel.hidden = true;
+                }
+            });
+            observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+        })();
+    </script>
+</body>
+
+</html>

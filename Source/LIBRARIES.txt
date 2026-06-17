@@ -1,0 +1,28 @@
+CYBER ENDLESS RUNNER 3D - THU VIEN SU DUNG
+
+Project dung JavaScript, Three.js va WebGL. Cac thu vien duoc khai bao trong package.json:
+
+Dependencies:
+- three: render 3D, scene, camera, geometry, material, lighting, shadow, GLTFLoader.
+- @tweenjs/tween.js: ho tro tween/transition animation.
+- howler: phat am thanh game.
+- hammerjs: ho tro thao tac touch/swipe.
+- lodash: tien ich JavaScript.
+- animate.css: ho tro hieu ung CSS.
+
+Dev dependencies:
+- webpack, webpack-cli: bundle source code thanh dist/app.bundle.js.
+- dat.gui: panel debug/demo camera, light, shadow, transform.
+- spectorjs: cong cu debug WebGL khi can.
+- @types/dat.gui: type definitions cho dat.gui.
+
+Cach cai lai thu vien:
+1. Mo terminal tai thu muc Source.
+2. Chay: npm install
+3. Build lai: npm run build
+
+Ghi chu:
+- Thu muc node_modules khong bat buoc trong Source vi co the cai lai tu package.json va package-lock.json.
+- Thu muc Source cung da kem san dist/app.bundle.js, nen co the chay nhanh bang local server.
+- Neu sua code trong src thi can chay npm install va npm run build de tao lai dist/app.bundle.js.
+- Ban Release da co san bundle dist/app.bundle.js nen chay demo khong can npm install.
