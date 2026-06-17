@@ -17,6 +17,7 @@
 
 <br/>
 
+## 🎥 Gameplay Demo
 <img src="Docs/demo.gif" alt="Cyber Endless Runner 3D - Gameplay Demo" width="100%">
 <p><em>🎮 Gameplay</em></p>
 
@@ -211,10 +212,11 @@ Nếu bạn muốn tùy chỉnh hoặc sửa mã nguồn. Yêu cầu có **Node.
 
 | **Thành viên** | **MSSV** | GitHub |
 |---|---|---|
-| *Cáp Kim Hải Anh* | *23520036* | [@ckha1410](https://github.com/ckha1410) |
-| *Nguyễn Bá Long* | *23520880* | [@NBasLongz](https://github.com/NBasLongz) |
+| Cáp Kim Hải Anh | 23520036 | [@ckha1410](https://github.com/ckha1410) |
+| Nguyễn Bá Long | 23520880 | [@NBasLongz](https://github.com/NBasLongz) |
 
 **Lớp/Môn:** *CS105.Q22 - Đồ hoạ máy tính*
+
 **Trường:** *Trường Đại học Công nghệ thông tin - ĐHQG-HCM* 
 
 </div>
