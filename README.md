@@ -18,7 +18,7 @@
 <br/>
 
 ## 🎥 Gameplay Demo
-<img src="Docs/demo.gif" alt="Cyber Endless Runner 3D - Gameplay Demo" width="100%">
+<img src="Docs/demo.gif" alt="Cyber Endless Runner 3D - Gameplay Demo" width="80%">
 <p><em>🎮 Gameplay</em></p>
 
 </div>
